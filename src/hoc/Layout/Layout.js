@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { Drawer } from '../../components/Navigation/Drawer/Drawer';
 // import { connect } from 'react-redux';
-// import { Drawer } from '../../components/Navigation/MenuToggle/Drawer/Drawer';
 import { MenuToggle } from '../../components/Navigation/MenuToggle/MenuToggle';
 import classes from './Layout.module.css';
 
@@ -10,11 +10,12 @@ const Layout = ({ children }) => {
   const toggleHanlder = () => {
     setMenu(!menu);
   };
-  // const menuCloseHandler = () => {
-  //   setMenu(false);
-  // };
+  const menuCloseHandler = () => {
+    setMenu(false);
+  };
   return (
     <div className={classes.Layout}>
+      <Drawer isOpen={menu} onClose={menuCloseHandler} />
       <MenuToggle onToggle={toggleHanlder} isOpen={menu} />
       <main>{children}</main>
       {/* //   <Drawer
