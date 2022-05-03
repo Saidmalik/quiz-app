@@ -11,9 +11,25 @@
   padding: 0;
   margin: 0;
 }
+.FinishedQuiz ul li {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+}
 
+.FinishedQuiz ul li i {
+  margin-left: 10px;
+  font-size: 25px;
+}
 
 .FinishedQuiz button {
   color: #fff;
   background: rgb(11, 224, 178);
+}
+
+.success {
+  color: rgb(8, 170, 108);
+}
+.error {
+  color: rgb(235, 65, 53);
 }

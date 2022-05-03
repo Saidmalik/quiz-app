@@ -14,10 +14,17 @@ export const FinishedQuiz = ({ results, quiz, onRetry }) => {
     <div className={classes.FinishedQuiz}>
       <ul>
         {quiz.map((quizItem, index) => {
+          const cls = [
+            'fa',
+            results[quizItem.id] === 'error' ? 'fa-times' : 'fa-check',
+            classes[results[quizItem.id]],
+          ];
+
           return (
             <li key={index}>
               <strong>{index + 1}. </strong>
               {quizItem.question}
+              <i className={cls.join(' ')}></i>
             </li>
           );
         })}

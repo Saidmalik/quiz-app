@@ -7,6 +7,8 @@
   text-transform: uppercase;
   font-weight: bold;
   font-size: 12px;
+  /* border: none; */
+  cursor: pointer;
 }
 
 .Button:focus {
@@ -14,7 +16,7 @@
 }
 .Button:active {
   background: rgb(235, 102, 102);
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 15px rgba(9, 215, 167, 0.74);
 }
 .Button:disabled {
   background: #ccc;
@@ -26,7 +28,6 @@
 }
 .Button.success {
   background: rgb(18, 226, 46);
-  color: black;
 }
 .Button.primary {
   background: rgb(15, 126, 230);
