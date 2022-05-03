@@ -12,11 +12,8 @@
   margin: 0;
 }
 
-.FinishedQuiz i {
-  margin-right: 50px;
-}
+
 .FinishedQuiz button {
   color: #fff;
   background: rgb(11, 224, 178);
 }
-

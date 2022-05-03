@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Backdrop } from '../../../UI/Backdrop/Backdrop';
+import { Backdrop } from '../../UI/Backdrop/Backdrop';
 import classes from './Drawer.module.css';
 
 export const Drawer = (props) => {
