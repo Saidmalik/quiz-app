@@ -1,37 +1,42 @@
 import classes from './Quiz.module.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ActiveQuiz } from '../../components/ActiveQuiz/ActiveQuiz';
 import { FinishedQuiz } from '../../components/FinishedQuiz/FinishedQuiz';
+import axios from '../../axios/axios-quiz';
+import { Loader } from '../../components/UI/Loader/Loader';
 
-const Quiz = () => {
-  const [quiz, setQuiz] = useState([
-    {
-      question: 'What is your fav color?',
-      rightAnswerId: 2,
-      id: 1,
-      answers: [
-        { text: 'White', id: 1 },
-        { text: 'Blue', id: 2 },
-        { text: 'Orange 3', id: 3 },
-        { text: 'Black', id: 4 },
-      ],
-    },
-    {
-      question: 'What is your fav car?',
-      rightAnswerId: 1,
-      id: 2,
-      answers: [
-        { text: 'BMW', id: 1 },
-        { text: 'Porsche', id: 2 },
-        { text: 'Mercedes', id: 3 },
-        { text: 'Audi', id: 4 },
-      ],
-    },
-  ]);
+const Quiz = (props) => {
+  const [quiz, setQuiz] = useState([]);
+  // const [quiz, setQuiz] = useState([
+  //   {
+  //     question: 'What is your fav color?',
+  //     rightAnswerId: 2,
+  //     id: 1,
+  //     answers: [
+  //       { text: 'White', id: 1 },
+  //       { text: 'Blue', id: 2 },
+  //       { text: 'Orange 3', id: 3 },
+  //       { text: 'Black', id: 4 },
+  //     ],
+  //   },
+  //   {
+  //     question: 'What is your fav car?',
+  //     rightAnswerId: 1,
+  //     id: 2,
+  //     answers: [
+  //       { text: 'BMW', id: 1 },
+  //       { text: 'Porsche', id: 2 },
+  //       { text: 'Mercedes', id: 3 },
+  //       { text: 'Audi', id: 4 },
+  //     ],
+  //   },
+  // ]);
+
   const [activeQuestion, setActiveQuestion] = useState(0);
   const [answerState, setAnswerState] = useState(null);
   const [isFinished, setIsFinished] = useState(false);
   const [results, setResults] = useState({});
+  const [loading, setLoading] = useState(true);
 
   const onAnswerHandler = (answerId) => {
     if (answerState) {
@@ -76,11 +81,26 @@ const Quiz = () => {
     setIsFinished(false);
     setResults({});
   };
+  //works not appropriate => go to react-router-dom
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const resp = axios.get(`/quizes/${props.match.params.id}.json`);
+        const quiz = resp.data;
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetch();
+  }, [props.match.params.id]);
+
   return (
     <div className={classes.Quiz}>
       <div className={classes.QuizWrapper}>
         <h1>Answer the questions</h1>
-        {isFinished ? (
+        {loading ? (
+          <Loader />
+        ) : isFinished ? (
           <FinishedQuiz results={results} quiz={quiz} onRetry={retryHandler} />
         ) : (
           <ActiveQuiz

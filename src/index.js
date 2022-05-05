@@ -3,13 +3,20 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import rootReducer from './redux/reducers/rootReducer';
 
 const root = createRoot(document.getElementById('root'));
 
+const store = configureStore({ reducer: rootReducer });
+
 root.render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>
+  <Provider store={store}>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </Provider>
 );
 reportWebVitals();
 

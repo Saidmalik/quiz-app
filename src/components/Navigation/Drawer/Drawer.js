@@ -4,7 +4,7 @@ import { Backdrop } from '../../UI/Backdrop/Backdrop';
 
 import classes from './Drawer.module.css';
 
-export const Drawer = ({ isOpen, onClose }) => {
+export const Drawer = ({ isOpen, onClose, isAuthenticated }) => {
   const cls = [classes.Drawer];
   if (!isOpen) {
     cls.push(classes.close);
@@ -13,27 +13,30 @@ export const Drawer = ({ isOpen, onClose }) => {
     return links.map((link, index) => {
       return (
         <li key={index}>
-          Link {link}
-          {/* <Link
+          <NavLink
             to={link.to}
-            exact={link.exact}
             activeClassName={classes.active}
-            onClick={props.onClose}
+            onClick={onClose}
           >
             {link.label}
-          </Link> */}
+          </NavLink>
         </li>
       );
     });
   };
 
-  const links = [1, 2, 3];
-  // const links = [{ to: '/', label: 'Тесты', exact: true }];
-  // if (props.isAuthenticated) {
-  //   links.push({ to: '/quiz-creator', label: 'Создать тест', exact: false });
-  //   links.push({ to: '/logout', label: 'Выйти', exact: false });
+  const links = [
+    { to: '/', label: 'Tests' },
+    { to: '/quiz-creator', label: 'Create test' },
+    { to: '/logout', label: 'Logout' },
+    { to: '/auth', label: 'Auth' },
+  ];
+
+  // if (isAuthenticated) {
+  //   links.push({ to: '/quiz-creator', label: 'Создать тест' });
+  //   links.push({ to: '/logout', label: 'Выйти' });
   // } else {
-  //   links.push({ to: '/auth', label: 'Авторизация', exact: false });
+  //   links.push({ to: '/auth', label: 'Авторизация' });
   // }
   // console.log('auth', props.isAuthenticated);
 

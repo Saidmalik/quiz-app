@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import { Drawer } from '../../components/Navigation/Drawer/Drawer';
 // import { connect } from 'react-redux';
 import { MenuToggle } from '../../components/Navigation/MenuToggle/MenuToggle';
@@ -17,7 +18,10 @@ const Layout = ({ children }) => {
     <div className={classes.Layout}>
       <Drawer isOpen={menu} onClose={menuCloseHandler} />
       <MenuToggle onToggle={toggleHanlder} isOpen={menu} />
-      <main>{children}</main>
+      <main>
+        {/* {children} */}
+        <Outlet />
+      </main>
       {/* //   <Drawer
     //     isOpen={menu}
     //     onClose={menuCloseHandler}

@@ -36,9 +36,9 @@ export const FinishedQuiz = ({ results, quiz, onRetry }) => {
         <Button onClick={onRetry} type='primary'>
           Retry
         </Button>
-        {/* <Link to={'/'}> */}
-        <Button type='success'>Go to Tests</Button>
-        {/* </Link> */}
+        <Link to={'/'}>
+          <Button type='success'>Go to Tests</Button>
+        </Link>
       </div>
     </div>
   );

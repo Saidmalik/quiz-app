@@ -1,12 +1,23 @@
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Quiz from './containers/Quiz/Quiz';
 import Layout from './hoc/Layout/Layout';
+import QuizCreator from './containers/QuizCreator/QuizCreator';
+import QuizList from './containers/QuizList/QuizList';
+import Auth from './containers/Auth/Auth';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 function App() {
   return (
-    <Layout>
-      <Quiz></Quiz>
-    </Layout>
+    <Routes>
+      <Route path={'/'} element={<Layout />}>
+        <Route path={'auth'} element={<Auth />} />
+        <Route path={'quiz-creator'} element={<QuizCreator />} />
+        <Route path={'quiz/:id'} element={<Quiz />} />
+        <Route index element={<QuizList />} />
+        <Route path='*' element={<NotFoundPage />} />
+      </Route>
+    </Routes>
   );
 }
 export default App;
@@ -44,10 +55,8 @@ export default App;
 //         <Route path={'/logout'} element={<Logout />} />
 //         <Route
 //           path={'/'}
-//           // exact
 //           element={<QuizList />}
 //         />
-//         {/* <Redirect to={'/'}></Redirect> */}
 //         <Navigate replace to={'/'}></Navigate>
 //       </Routes>
 //     );
