@@ -13,6 +13,7 @@ import {
 export const fetchQuizes = () => {
   return async (dispatch) => {
     dispatch(fetchQuizesStart()); //we began start loading
+    
     try {
       const response = await axios.get('/quizes.json');
 
@@ -25,7 +26,8 @@ export const fetchQuizes = () => {
       });
 
       dispatch(fetchQuizesSuccess(quizesCopy)); //when we got some data
-    } catch (e) {
+    }
+    catch (e) {
       dispatch(fetchQuizesError(e));
     }
   };

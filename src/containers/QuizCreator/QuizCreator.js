@@ -8,7 +8,7 @@ import {
 } from '../../form/FormFrameWork';
 import { Input } from '../../components/UI/Input/Input';
 import { Select } from '../../components/UI/Select/Select';
-import axios from '../../axios/axios-quiz';
+import axiosQuiz from '../../axios/axios-quiz';
 // import { connect } from 'react-redux';
 // import {
 //   createQuizQuestion,
@@ -83,7 +83,7 @@ const QuizCreator = (props) => {
   const createQuizHandler = async (event) => {
     event.preventDefault();
     try {
-      await axios.post('/quizes.json', quiz);
+      await axiosQuiz.post('/quizes.json', quiz);
 
       setQuiz([]);
       setFormControls(createFormControls());

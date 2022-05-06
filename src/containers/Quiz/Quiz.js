@@ -2,41 +2,32 @@ import classes from './Quiz.module.css';
 import { useState, useEffect } from 'react';
 import { ActiveQuiz } from '../../components/ActiveQuiz/ActiveQuiz';
 import { FinishedQuiz } from '../../components/FinishedQuiz/FinishedQuiz';
-import axios from '../../axios/axios-quiz';
+import axiosQuiz from '../../axios/axios-quiz';
 import { Loader } from '../../components/UI/Loader/Loader';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  fetchQuizById,
+  quizAnswerClick,
+  retryQuiz,
+} from '../../redux/reducers/quiz';
+import { useParams } from 'react-router-dom';
 
 const Quiz = (props) => {
-  const [quiz, setQuiz] = useState([]);
-  // const [quiz, setQuiz] = useState([
-  //   {
-  //     question: 'What is your fav color?',
-  //     rightAnswerId: 2,
-  //     id: 1,
-  //     answers: [
-  //       { text: 'White', id: 1 },
-  //       { text: 'Blue', id: 2 },
-  //       { text: 'Orange 3', id: 3 },
-  //       { text: 'Black', id: 4 },
-  //     ],
-  //   },
-  //   {
-  //     question: 'What is your fav car?',
-  //     rightAnswerId: 1,
-  //     id: 2,
-  //     answers: [
-  //       { text: 'BMW', id: 1 },
-  //       { text: 'Porsche', id: 2 },
-  //       { text: 'Mercedes', id: 3 },
-  //       { text: 'Audi', id: 4 },
-  //     ],
-  //   },
-  // ]);
+  // const [quiz, setQuiz] = useState([]);
+  // const [activeQuestion, setActiveQuestion] = useState(0);
+  // const [answerState, setAnswerState] = useState(null);
+  // const [isFinished, setIsFinished] = useState(false);
+  // const [results, setResults] = useState({});
+  // const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
 
-  const [activeQuestion, setActiveQuestion] = useState(0);
-  const [answerState, setAnswerState] = useState(null);
-  const [isFinished, setIsFinished] = useState(false);
-  const [results, setResults] = useState({});
-  const [loading, setLoading] = useState(true);
+  const { id } = useParams();
+  const quiz = useSelector((state) => state.quiz.quiz);
+  const activeQuestion = useSelector((state) => state.quiz.activeQuestion);
+  const answerState = useSelector((state) => state.quiz.answerState);
+  const isFinished = useSelector((state) => state.quiz.isFinished);
+  const results = useSelector((state) => state.quiz.results);
+  const loading = useSelector((state) => state.quiz.loading);
 
   const onAnswerHandler = (answerId) => {
     if (answerState) {
@@ -85,14 +76,14 @@ const Quiz = (props) => {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const resp = axios.get(`/quizes/${props.match.params.id}.json`);
+        const resp = axiosQuiz.get(`/quizes/${id}.json`);
         const quiz = resp.data;
       } catch (error) {
         console.log(error);
       }
     };
     fetch();
-  }, [props.match.params.id]);
+  }, [id]);
 
   return (
     <div className={classes.Quiz}>

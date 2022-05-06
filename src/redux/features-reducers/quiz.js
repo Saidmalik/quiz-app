@@ -1,5 +1,15 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axiosQuiz from '../../axios/axios-quiz';
+import { createSlice } from '@reduxjs/toolkit';
+
+// import {
+//   FETCH_QUIZES_START,
+//   FETCH_QUIZES_ERROR,
+//   FETCH_QUIZES_SUCCESS,
+//   FETCH_QUIZ_SUCCESS,
+//   FINISH_QUIZ,
+//   QUIZ_SET_STATE,
+//   QUIZ_NEXT_QUESTION,
+//   RETRY_QUIZ,
+// } from '../actions/actionTypes';
 
 const initialState = {
   quizes: [],
@@ -12,38 +22,17 @@ const initialState = {
   quiz: null, //not [] like was before, we put null to define there data
 };
 
-export const fetchQuizes = createAsyncThunk(
-  'quiz/fetchQuizes',
-  async (_, { rejectWithValue, dispatch }) => {
-    dispatch(fetchQuizesStart());
-    try {
-      const response = await axiosQuiz.get('/quizes.json');
-
-      const quizesCopy = [];
-      Object.keys(response.data).forEach((key, index) => {
-        quizesCopy.push({
-          id: key,
-          name: `Test #${index + 1}`,
-        });
-      });
-
-      dispatch(fetchQuizesSuccess(quizesCopy));
-    } catch (e) {
-      dispatch(fetchQuizesError(e));
-    }
-  }
-);
-
 export const quizReducer = createSlice({
   name: 'quiz',
   initialState,
   reducers: {
+    //these are actions
     fetchQuizesStart: (state) => {
       state.loading = true;
     },
+
     fetchQuizesSuccess: (state, action) => {
       state.loading = false;
-      //action.payload should be (but i think there is no diff in any cases)
       state.quizes = action.quizes;
     },
     fetchQuizesError: (state, action) => {
@@ -72,24 +61,7 @@ export const quizReducer = createSlice({
       state.results = {};
     },
   },
-  extraReducers: {
-    [fetchQuizes.fulfilled]: () => console.log('fulfilled'),
-    [fetchQuizes.pending]: () => console.log('pending'),
-    [fetchQuizes.rejected]: () => console.log('rejected'),
-  },
 });
-
-export const {
-  fetchQuizesStart,
-  fetchQuizesSuccess,
-  fetchQuizesError,
-  fetchQuizSuccess,
-  quizNextQuestion,
-  quizSetState,
-  finishQuiz,
-  retryQuiz,
-} = quizReducer.actions;
-export default quizReducer.reducer;
 
 // import {
 //   FETCH_QUIZES_START,

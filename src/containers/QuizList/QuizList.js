@@ -1,15 +1,17 @@
 import classes from './QuizList.module.css';
 import { NavLink } from 'react-router-dom';
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Loader } from '../../components/UI/Loader/Loader';
-// import { connect } from 'react-redux';
-// import { fetchQuizes } from '../../redux/actions/quiz';
-// import { ActiveQuiz } from '../../components/ActiveQuiz/ActiveQuiz';
-const QuizList = (props) => {
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchQuizes } from '../../redux/reducers/quiz';
+
+const QuizList = () => {
+  const dispatch = useDispatch();
+  const quizes = useSelector((state) => state.quiz.quizes);
+  const loading = useSelector((state) => state.quiz.loading);
+
   const renderQuizes = () => {
-    //remove props from here
-    return props.quizes.map((quiz) => {
+    return quizes?.map((quiz) => {
       return (
         <li key={quiz.id}>
           <NavLink to={'/quiz/' + quiz.id}>{quiz.name}</NavLink>
@@ -19,43 +21,17 @@ const QuizList = (props) => {
   };
 
   useEffect(() => {
-    const fetch = async () => {
-      try {
-        const response = await axios.get(
-          'https://react-quiz-f6e79-default-rtdb.firebaseio.com/quizes.json'
-        );
-        //here should be an object.keys
-        console.log(response.data);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    fetch();
+    dispatch(fetchQuizes());
   }, []);
 
   return (
     <div className={classes.QuizList}>
       <h1>Test list</h1>
-      {props.loading && props.quizes.length !== 0 ? (
-        <Loader />
-      ) : (
-        <ul>{renderQuizes()}</ul>
-      )}
+      {loading && quizes.length !== 0 ? <Loader /> : <ul>{renderQuizes()}</ul>}
     </div>
   );
 };
 
-// const mapStateToProps = (state) => {
-//   return {
-//     quizes: state.quiz.quizes,
-//     loading: state.quiz.loading,
-//   };
-// };
-// const mapDispatchToProps = (dispatch) => {
-//   return {
-//     fetchQuizes: () => dispatch(fetchQuizes()),
-//   };
-// };
 export default QuizList;
 
 // import classes from './QuizList.module.css';
