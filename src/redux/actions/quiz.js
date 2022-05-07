@@ -91,6 +91,7 @@ export const quizNextQuestion = (questionNumber) => {
     questionNumber,
   };
 };
+
 export const quizAnswerClick = (answerId) => {
   return (dispatch, getState) => {
     const state = getState().quiz;

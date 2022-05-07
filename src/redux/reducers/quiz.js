@@ -34,6 +34,67 @@ export const fetchQuizes = createAsyncThunk(
   }
 );
 
+export const fetchQuizById = createAsyncThunk(
+  'quiz/fetchQuizById',
+  async (quizId, { rejectWithValue, dispatch }) => {
+    // return (dispatch) => {
+    dispatch(fetchQuizesStart());
+
+    try {
+      const response = await axiosQuiz.get(`/quizes/${quizId}.json`);
+      const quizCopy = response.data;
+
+      dispatch(fetchQuizSuccess(quizCopy));
+    } catch (e) {
+      dispatch(fetchQuizesError(e));
+    }
+    // };
+  }
+);
+
+export const quizAnswerClick = createAsyncThunk(
+  'quiz/quizAnswerClick',
+  (answerId, { rejectWithValue, dispatch, getState }) => {
+    // return (dispatch) => {
+    const state = getState().quiz.quiz;
+
+    if (state.answerState) {
+      const key = Object.keys(state.answerState)[0];
+      if (state.answerState[key] === 'success') {
+        return;
+      }
+    }
+    const question = state.quiz[state.activeQuestion];
+    const results = state.results;
+
+    if (question.rightAnswerId === answerId) {
+      if (!results[question.id]) {
+        results[question.id] = 'success';
+      }
+      dispatch(quizSetState({ [answerId]: 'success' }, results));
+
+      const timeout = window.setTimeout(() => {
+        if (isQuizFinished(state)) {
+          dispatch(finishQuiz());
+        } else {
+          dispatch(quizNextQuestion(state.activeQuestion + 1));
+        }
+        window.clearTimeout(timeout);
+      }, 500);
+    } else {
+      results[question.id] = 'error';
+      dispatch(quizSetState({ [answerId]: 'error' }, results));
+      //may be here i should do another independent action
+    }
+    // };
+  }
+);
+//re-create
+const isQuizFinished = (state) => {
+  //local function  needs to quizAnswerClick
+  return state.activeQuestion + 1 === state.quiz.length;
+};
+
 export const quizReducer = createSlice({
   name: 'quiz',
   initialState,
@@ -58,6 +119,8 @@ export const quizReducer = createSlice({
       state.answerState = action.answerState;
       state.results = action.results;
     },
+    //may be you should create another action to do quizSetstate
+
     finishQuiz: (state) => {
       state.isFinished = true;
     },
@@ -73,9 +136,15 @@ export const quizReducer = createSlice({
     },
   },
   extraReducers: {
-    [fetchQuizes.fulfilled]: () => console.log('fulfilled'),
-    [fetchQuizes.pending]: () => console.log('pending'),
-    [fetchQuizes.rejected]: () => console.log('rejected'),
+    [fetchQuizes.fulfilled]: () => console.log('fetchQuizes fulfilled'),
+    [fetchQuizes.pending]: () => console.log('fetchQuizes pending'),
+    [fetchQuizes.rejected]: () => console.log('fetchQuizes rejected'),
+    [fetchQuizById.fulfilled]: () => console.log('fetchQuizById fulfilled'),
+    [fetchQuizById.pending]: () => console.log('fetchQuizById pending'),
+    [fetchQuizById.rejected]: () => console.log('fetchQuizById rejected'),
+    [quizAnswerClick.fulfilled]: () => console.log('quizAnswerClick fulfilled'),
+    [quizAnswerClick.pending]: () => console.log('quizAnswerClick pending'),
+    [quizAnswerClick.rejected]: () => console.log('quizAnswerClick rejected'),
   },
 });
 

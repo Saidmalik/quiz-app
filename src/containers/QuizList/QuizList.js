@@ -22,7 +22,7 @@ const QuizList = () => {
 
   useEffect(() => {
     dispatch(fetchQuizes());
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className={classes.QuizList}>

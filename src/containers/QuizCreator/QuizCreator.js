@@ -9,11 +9,12 @@ import {
 import { Input } from '../../components/UI/Input/Input';
 import { Select } from '../../components/UI/Select/Select';
 import axiosQuiz from '../../axios/axios-quiz';
+import { useDispatch, useSelector } from 'react-redux';
 // import { connect } from 'react-redux';
-// import {
-//   createQuizQuestion,
-//   finishCreateQuiz,
-// } from '../../redux/actions/create';
+import {
+  createQuizQuestion,
+  finishCreateQuiz,
+} from '../../redux/reducers/create';
 
 const createOptionControl = (number) => {
   return createControl(
@@ -45,7 +46,9 @@ const QuizCreator = (props) => {
   const [formControls, setFormControls] = useState(createFormControls());
   const [rightAnswerId, setRightAnswerId] = useState(1);
   const [isFormValid, setIsFormValid] = useState(false);
-  const [quiz, setQuiz] = useState([]);
+  // const [quiz, setQuiz] = useState([]);
+  const dispatch = useDispatch();
+  const quiz = useSelector((state) => state.create.quiz);
 
   const submitHandler = (event) => {
     event.preventDefault();
@@ -54,16 +57,11 @@ const QuizCreator = (props) => {
   const addQuestionHandler = (event) => {
     event.preventDefault();
 
-    const quizCopy = quiz.concat();
-    const index = quizCopy + 1;
-
     const { question, option1, option2, option3, option4 } = formControls;
-
-    // console.log(question, question.value);
 
     const questionItem = {
       question: question.value,
-      id: index,
+      id: quiz.length + 1,
       rightAnswerId: rightAnswerId,
       answers: [
         { text: option1.value, id: option1.id },
@@ -72,26 +70,23 @@ const QuizCreator = (props) => {
         { text: option4.value, id: option4.id },
       ],
     };
-    quizCopy.push(questionItem);
-    // props.createQuizQuestion(questionItem);
-    setQuiz(quizCopy);
+
+    dispatch(createQuizQuestion(questionItem));
+
     setIsFormValid(false);
     setRightAnswerId(1);
     setFormControls(createFormControls());
   };
 
-  const createQuizHandler = async (event) => {
+  const createQuizHandler = (event) => {
     event.preventDefault();
-    try {
-      await axiosQuiz.post('/quizes.json', quiz);
+    axiosQuiz.post('/quizes.json', quiz);
 
-      setQuiz([]);
-      setFormControls(createFormControls());
-      setRightAnswerId(1);
-      setIsFormValid(false);
-    } catch (error) {
-      console.log(error);
-    }
+    // setQuiz([]);
+    setFormControls(createFormControls());
+    setRightAnswerId(1);
+    setIsFormValid(false);
+    dispatch(finishCreateQuiz());
 
     // setFormControls(createFormControls());
     // setRightAnswerId(1);

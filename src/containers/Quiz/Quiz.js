@@ -1,8 +1,7 @@
 import classes from './Quiz.module.css';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { ActiveQuiz } from '../../components/ActiveQuiz/ActiveQuiz';
 import { FinishedQuiz } from '../../components/FinishedQuiz/FinishedQuiz';
-import axiosQuiz from '../../axios/axios-quiz';
 import { Loader } from '../../components/UI/Loader/Loader';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -12,16 +11,9 @@ import {
 } from '../../redux/reducers/quiz';
 import { useParams } from 'react-router-dom';
 
-const Quiz = (props) => {
-  // const [quiz, setQuiz] = useState([]);
-  // const [activeQuestion, setActiveQuestion] = useState(0);
-  // const [answerState, setAnswerState] = useState(null);
-  // const [isFinished, setIsFinished] = useState(false);
-  // const [results, setResults] = useState({});
-  // const [loading, setLoading] = useState(true);
-  const dispatch = useDispatch();
-
+const Quiz = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
   const quiz = useSelector((state) => state.quiz.quiz);
   const activeQuestion = useSelector((state) => state.quiz.activeQuestion);
   const answerState = useSelector((state) => state.quiz.answerState);
@@ -29,75 +21,32 @@ const Quiz = (props) => {
   const results = useSelector((state) => state.quiz.results);
   const loading = useSelector((state) => state.quiz.loading);
 
-  const onAnswerHandler = (answerId) => {
-    if (answerState) {
-      const key = Object.keys(answerState)[0];
-      if (answerState[key] === 'success') {
-        return;
-      }
-    }
-
-    const question = quiz[activeQuestion];
-    const resultsOfAnswers = results;
-
-    if (question.rightAnswerId === answerId) {
-      if (!resultsOfAnswers[question.id]) {
-        resultsOfAnswers[question.id] = 'success';
-      }
-      setAnswerState({ [answerId]: 'success' });
-      setAnswerState(null);
-      setResults(resultsOfAnswers);
-
-      const timeout = window.setTimeout(() => {
-        if (isQuizFinished()) {
-          setIsFinished(true);
-        } else {
-          setActiveQuestion(activeQuestion + 1);
-        }
-        window.clearTimeout(timeout);
-      }, 1000);
-    } else {
-      resultsOfAnswers[question.id] = 'error';
-      setAnswerState({ [answerId]: 'error' });
-      setResults(resultsOfAnswers);
-    }
-  };
-
-  const isQuizFinished = () => {
-    return activeQuestion + 1 === quiz.length;
-  };
-  const retryHandler = () => {
-    setActiveQuestion(0);
-    setAnswerState(null);
-    setIsFinished(false);
-    setResults({});
-  };
-  //works not appropriate => go to react-router-dom
   useEffect(() => {
-    const fetch = async () => {
-      try {
-        const resp = axiosQuiz.get(`/quizes/${id}.json`);
-        const quiz = resp.data;
-      } catch (error) {
-        console.log(error);
-      }
+    dispatch(fetchQuizById(id));
+
+    //read more about useEffect
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    return () => {
+      //to do unmount
+      retryQuiz();
     };
-    fetch();
-  }, [id]);
+  }, []);
 
   return (
     <div className={classes.Quiz}>
       <div className={classes.QuizWrapper}>
         <h1>Answer the questions</h1>
-        {loading ? (
+        {loading || !quiz ? (
           <Loader />
         ) : isFinished ? (
-          <FinishedQuiz results={results} quiz={quiz} onRetry={retryHandler} />
+          <FinishedQuiz results={results} quiz={quiz} onRetry={retryQuiz} />
         ) : (
           <ActiveQuiz
             answers={quiz[activeQuestion].answers}
             question={quiz[activeQuestion].question}
-            onAnswerClick={onAnswerHandler}
+            onAnswerClick={quizAnswerClick}
             quizLength={quiz.length}
             answerNumber={activeQuestion + 1}
             state={answerState}

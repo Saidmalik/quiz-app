@@ -1,7 +1,18 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axiosQuiz from '../../axios/axios-quiz';
+
 const initialState = {
   quiz: [],
 };
+
+export const finishCreateQuiz = createAsyncThunk(
+  'create/finishCreateQuiz',
+  async (_, { rejectWithValue, dispatch, getState }) => {
+    axiosQuiz.post('/quizes.json', getState().create.quiz);
+    dispatch(resetQuizCreation());
+  }
+);
+
 export const createReducer = createSlice({
   name: 'create',
   initialState,
@@ -13,11 +24,15 @@ export const createReducer = createSlice({
       state.quiz = [];
     },
   },
+  extraReducers: {
+    [finishCreateQuiz.fulfilled]: console.log('finishCreateQuiz fulfilled'),
+    [finishCreateQuiz.pending]: console.log('finishCreateQuiz pending'),
+    [finishCreateQuiz.rejected]: console.log('finishCreateQuiz rejected'),
+  },
 });
 
 export const { createQuizQuestion, resetQuizCreation } = createReducer.actions;
 export default createReducer.reducer;
-
 
 // import {
 //   CREATE_QUIZ_QUESTION,
