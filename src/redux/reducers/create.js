@@ -7,28 +7,30 @@ const initialState = {
 
 export const finishCreateQuiz = createAsyncThunk(
   'create/finishCreateQuiz',
-  async (_, { rejectWithValue, dispatch, getState }) => {
-    axiosQuiz.post('/quizes.json', getState().create.quiz);
+  async (_, { dispatch, getState }) => {
+    await axiosQuiz.post('/quizes.json', getState().create.quiz);
+    // console.log(getState().create.quiz, 'its getstate');
+
     dispatch(resetQuizCreation());
   }
 );
-
+//создается 2 теста + не работает кнопка клика
 export const createReducer = createSlice({
   name: 'create',
   initialState,
   reducers: {
     createQuizQuestion: (state, action) => {
-      state.quiz = [...state.quiz, action.item];
+      state.quiz = [...state.quiz, action.payload];
     },
     resetQuizCreation: (state) => {
       state.quiz = [];
     },
   },
-  extraReducers: {
-    [finishCreateQuiz.fulfilled]: console.log('finishCreateQuiz fulfilled'),
-    [finishCreateQuiz.pending]: console.log('finishCreateQuiz pending'),
-    [finishCreateQuiz.rejected]: console.log('finishCreateQuiz rejected'),
-  },
+  // extraReducers: {
+  //   [finishCreateQuiz.pending]: (state) => {},
+  //   [finishCreateQuiz.fulfilled]: (state, action) => {},
+  //   [finishCreateQuiz.rejected]: (state, action) => {},
+  // },
 });
 
 export const { createQuizQuestion, resetQuizCreation } = createReducer.actions;

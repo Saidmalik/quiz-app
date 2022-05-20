@@ -10,11 +10,11 @@ import { Input } from '../../components/UI/Input/Input';
 import { Select } from '../../components/UI/Select/Select';
 import axiosQuiz from '../../axios/axios-quiz';
 import { useDispatch, useSelector } from 'react-redux';
-// import { connect } from 'react-redux';
+
 import {
   createQuizQuestion,
   finishCreateQuiz,
-} from '../../redux/reducers/create';
+} from '../../redux/reducers/create.js';
 
 const createOptionControl = (number) => {
   return createControl(
@@ -42,14 +42,14 @@ const createFormControls = () => {
   };
 };
 
-const QuizCreator = (props) => {
+const QuizCreator = () => {
   const [formControls, setFormControls] = useState(createFormControls());
   const [rightAnswerId, setRightAnswerId] = useState(1);
   const [isFormValid, setIsFormValid] = useState(false);
-  // const [quiz, setQuiz] = useState([]);
   const dispatch = useDispatch();
-  const quiz = useSelector((state) => state.create.quiz);
+  const { quiz } = useSelector((state) => state.create);
 
+  // console.log(quiz, 'quiz is ...');
   const submitHandler = (event) => {
     event.preventDefault();
   };
@@ -82,17 +82,11 @@ const QuizCreator = (props) => {
     event.preventDefault();
     axiosQuiz.post('/quizes.json', quiz);
 
-    // setQuiz([]);
     setFormControls(createFormControls());
     setRightAnswerId(1);
     setIsFormValid(false);
+
     dispatch(finishCreateQuiz());
-
-    // setFormControls(createFormControls());
-    // setRightAnswerId(1);
-    // setIsFormValid(false);
-
-    // props.finishCreateQuiz();
   };
 
   const changeHandler = (value, controlName) => {
@@ -173,18 +167,6 @@ const QuizCreator = (props) => {
     </div>
   );
 };
-
-// const mapStateToProps = (state) => {
-//   return {
-//     quiz: state.create.quiz,
-//   };
-// };
-// const mapDispatchToProps = (dispatch) => {
-//   return {
-//     finishCreateQuiz: () => dispatch(finishCreateQuiz()),
-//     createQuizQuestion: (item) => dispatch(createQuizQuestion(item)),
-//   };
-// };
 
 export default QuizCreator;
 

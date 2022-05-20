@@ -1,12 +1,18 @@
+import { useDispatch } from 'react-redux';
 import classes from './AnswerItem.module.css';
 
 export const AnswerItem = ({ answer, onAnswerClick, state }) => {
+  const dispatch = useDispatch();
   const cls = [classes.AnswerItem];
+
   if (state) {
     cls.push(classes[state]);
   }
   return (
-    <li className={cls.join(' ')} onClick={() => onAnswerClick(answer.id)}>
+    <li
+      className={cls.join(' ')}
+      onClick={() => dispatch(onAnswerClick(answer.id))}
+    >
       {answer.text}
     </li>
   );

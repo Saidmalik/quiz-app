@@ -1,8 +1,8 @@
-import { Button } from '../../components/UI/Button/Button';
-import { Input } from '../../components/UI/Input/Input';
-import classes from './Auth.module.css';
-import { useState } from 'react';
-import axios from 'axios';
+import { Button } from "../../components/UI/Button/Button";
+import { Input } from "../../components/UI/Input/Input";
+import classes from "./Auth.module.css";
+import { useState } from "react";
+// import axios from 'axios';
 // import { connect } from 'react-redux';
 // import { auth } from '../../redux/actions/auth';
 
@@ -15,24 +15,24 @@ const validateEmail = (email) => {
 const Auth = (props) => {
   const [formControls, setFormControls] = useState({
     email: {
-      value: '',
-      type: 'email',
-      label: 'Email',
+      value: "",
+      type: "email",
+      label: "Email",
       valid: false,
       touched: false,
-      errorMessage: 'Please enter a correct email',
+      errorMessage: "Please enter a correct email",
       validation: {
         required: true,
         email: true,
       },
     },
     password: {
-      value: '',
-      type: 'password',
-      label: 'Password',
+      value: "",
+      type: "password",
+      label: "Password",
       valid: false,
       touched: false,
-      errorMessage: 'Please enter a correct password',
+      errorMessage: "Please enter a correct password",
       validation: {
         required: true,
         minLength: 6,
@@ -58,7 +58,7 @@ const Auth = (props) => {
 
     let isValid = true;
     if (validation.required) {
-      isValid = value.trim() !== '' && isValid; //переопределение переменной isValid
+      isValid = value.trim() !== "" && isValid; //переопределение переменной isValid
     }
     if (validation.email) {
       isValid = validateEmail(value) && isValid;
@@ -121,11 +121,11 @@ const Auth = (props) => {
         <form className={classes.AuthForm} onSubmit={submitHandler}>
           {renderInputs()}
 
-          <Button type='success' onClick={loginHandler} disabled={!isFormValid}>
+          <Button type="success" onClick={loginHandler} disabled={!isFormValid}>
             Log in
           </Button>
           <Button
-            type='primary'
+            type="primary"
             onClick={registerHandler}
             disabled={!isFormValid}
           >

@@ -9,7 +9,13 @@ import rootReducer from './redux/reducers/rootReducer';
 
 const root = createRoot(document.getElementById('root'));
 
-const store = configureStore({ reducer: rootReducer });
+const store = configureStore({
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
+});
 
 root.render(
   <Provider store={store}>

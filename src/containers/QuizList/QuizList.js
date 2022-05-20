@@ -7,8 +7,8 @@ import { fetchQuizes } from '../../redux/reducers/quiz';
 
 const QuizList = () => {
   const dispatch = useDispatch();
-  const quizes = useSelector((state) => state.quiz.quizes);
-  const loading = useSelector((state) => state.quiz.loading);
+
+  const { quizes, loading } = useSelector((state) => state.quiz);
 
   const renderQuizes = () => {
     return quizes?.map((quiz) => {

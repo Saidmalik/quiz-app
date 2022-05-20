@@ -14,25 +14,19 @@ import { useParams } from 'react-router-dom';
 const Quiz = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const quiz = useSelector((state) => state.quiz.quiz);
-  const activeQuestion = useSelector((state) => state.quiz.activeQuestion);
-  const answerState = useSelector((state) => state.quiz.answerState);
-  const isFinished = useSelector((state) => state.quiz.isFinished);
-  const results = useSelector((state) => state.quiz.results);
-  const loading = useSelector((state) => state.quiz.loading);
+
+  const { quiz, activeQuestion, answerState, isFinished, results, loading } =
+    useSelector((state) => state.quiz);
 
   useEffect(() => {
     dispatch(fetchQuizById(id));
-
-    //read more about useEffect
   }, [dispatch, id]);
 
   useEffect(() => {
     return () => {
-      //to do unmount
-      retryQuiz();
+      dispatch(retryQuiz());
     };
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className={classes.Quiz}>

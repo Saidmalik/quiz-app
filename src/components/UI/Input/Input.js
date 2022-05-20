@@ -19,6 +19,7 @@ export const Input = (props) => {
         id={htmlFor}
         value={props.value}
         onChange={props.onChange}
+        autoComplete='on' //in some variations
       />
       {isInvalid(props)
         ? <span>{props.errorMessage}</span> || 'Please enter a valid value'

@@ -9,89 +9,101 @@ const initialState = {
   answerState: null,
   isFinished: false,
   results: {},
-  quiz: null, //not [] like was before, we put null to define there data
+  quiz: null,
 };
 
 export const fetchQuizes = createAsyncThunk(
   'quiz/fetchQuizes',
-  async (_, { rejectWithValue, dispatch }) => {
-    dispatch(fetchQuizesStart());
+  async (_, { rejectWithValue }) => {
     try {
       const response = await axiosQuiz.get('/quizes.json');
 
-      const quizesCopy = [];
+      if (!response.status === 200) {
+        throw new Error('Data rendering error!');
+      }
+      const quizes = [];
+
       Object.keys(response.data).forEach((key, index) => {
-        quizesCopy.push({
+        quizes.push({
           id: key,
           name: `Test #${index + 1}`,
         });
       });
 
-      dispatch(fetchQuizesSuccess(quizesCopy));
-    } catch (e) {
-      dispatch(fetchQuizesError(e));
+      return quizes;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
   }
 );
 
 export const fetchQuizById = createAsyncThunk(
   'quiz/fetchQuizById',
-  async (quizId, { rejectWithValue, dispatch }) => {
-    // return (dispatch) => {
-    dispatch(fetchQuizesStart());
-
+  async (quizId, { rejectWithValue }) => {
     try {
       const response = await axiosQuiz.get(`/quizes/${quizId}.json`);
-      const quizCopy = response.data;
+      if (!response.status === 200) {
+        throw new Error('Erorr on rendering test id!');
+      }
+      const quiz = response.data;
 
-      dispatch(fetchQuizSuccess(quizCopy));
-    } catch (e) {
-      dispatch(fetchQuizesError(e));
+      return quiz;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
-    // };
   }
 );
 
 export const quizAnswerClick = createAsyncThunk(
   'quiz/quizAnswerClick',
   (answerId, { rejectWithValue, dispatch, getState }) => {
-    // return (dispatch) => {
-    const state = getState().quiz.quiz;
-
-    if (state.answerState) {
-      const key = Object.keys(state.answerState)[0];
-      if (state.answerState[key] === 'success') {
-        return;
-      }
-    }
-    const question = state.quiz[state.activeQuestion];
-    const results = state.results;
-
-    if (question.rightAnswerId === answerId) {
-      if (!results[question.id]) {
-        results[question.id] = 'success';
-      }
-      dispatch(quizSetState({ [answerId]: 'success' }, results));
-
-      const timeout = window.setTimeout(() => {
-        if (isQuizFinished(state)) {
-          dispatch(finishQuiz());
-        } else {
-          dispatch(quizNextQuestion(state.activeQuestion + 1));
+    const state = getState().quiz;
+    try {
+      if (state.answerState) {
+        const key = Object.keys(state.answerState)[0];
+        if (state.answerState[key] === 'success') {
+          return;
         }
-        window.clearTimeout(timeout);
-      }, 500);
-    } else {
-      results[question.id] = 'error';
-      dispatch(quizSetState({ [answerId]: 'error' }, results));
-      //may be here i should do another independent action
+      }
+      const question = state.quiz[state.activeQuestion];
+      const results = state.results;
+
+      if (question.rightAnswerId === answerId) {
+        console.log('you are right');
+
+        // if (!results[question.id]) {
+        //   results[question.id] = 'success'; //add success on results
+        // }
+        dispatch(
+          quizSetState({
+            answerState: { [answerId]: 'success' },
+            results: results,
+          })
+        );
+        const timeout = window.setTimeout(() => {
+          if (isQuizFinished(state)) {
+            dispatch(finishQuiz());
+          } else {
+            dispatch(quizNextQuestion(state.activeQuestion + 1));
+          }
+          window.clearTimeout(timeout);
+        }, 500);
+      } else {
+        // results[question.id] = 'error'; //stay undefined
+
+        dispatch(
+          quizSetState({
+            answerState: { [answerId]: 'error' },
+            results: results,
+          })
+        );
+      }
+    } catch (error) {
+      return rejectWithValue(error);
     }
-    // };
   }
 );
-//re-create
 const isQuizFinished = (state) => {
-  //local function  needs to quizAnswerClick
   return state.activeQuestion + 1 === state.quiz.length;
 };
 
@@ -99,33 +111,16 @@ export const quizReducer = createSlice({
   name: 'quiz',
   initialState,
   reducers: {
-    fetchQuizesStart: (state) => {
-      state.loading = true;
-    },
-    fetchQuizesSuccess: (state, action) => {
-      state.loading = false;
-      //action.payload should be (but i think there is no diff in any cases)
-      state.quizes = action.quizes;
-    },
-    fetchQuizesError: (state, action) => {
-      state.loading = false;
-      state.error = action.error;
-    },
-    fetchQuizSuccess: (state, action) => {
-      state.loading = false;
-      state.quiz = action.quiz;
-    },
     quizSetState: (state, action) => {
-      state.answerState = action.answerState;
-      state.results = action.results;
+      state.answerState = action.payload.answerState;
+      state.results = action.payload.results;
     },
-    //may be you should create another action to do quizSetstate
 
     finishQuiz: (state) => {
       state.isFinished = true;
     },
     quizNextQuestion: (state, action) => {
-      state.activeQuestion = action.questionNumber;
+      state.activeQuestion = action.payload;
       state.answerState = null;
     },
     retryQuiz: (state) => {
@@ -136,25 +131,51 @@ export const quizReducer = createSlice({
     },
   },
   extraReducers: {
-    [fetchQuizes.fulfilled]: () => console.log('fetchQuizes fulfilled'),
-    [fetchQuizes.pending]: () => console.log('fetchQuizes pending'),
-    [fetchQuizes.rejected]: () => console.log('fetchQuizes rejected'),
-    [fetchQuizById.fulfilled]: () => console.log('fetchQuizById fulfilled'),
-    [fetchQuizById.pending]: () => console.log('fetchQuizById pending'),
-    [fetchQuizById.rejected]: () => console.log('fetchQuizById rejected'),
-    [quizAnswerClick.fulfilled]: () => console.log('quizAnswerClick fulfilled'),
+    [fetchQuizes.pending]: (state) => {
+      state.loading = true;
+    },
+    [fetchQuizes.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.quizes = action.payload;
+    },
+
+    [fetchQuizes.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    [fetchQuizById.pending]: (state) => {
+      state.loading = true;
+    },
+    [fetchQuizById.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.quiz = action.payload;
+    },
+    [fetchQuizById.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
     [quizAnswerClick.pending]: () => console.log('quizAnswerClick pending'),
-    [quizAnswerClick.rejected]: () => console.log('quizAnswerClick rejected'),
+    [quizAnswerClick.fulfilled]: () => console.log('quizAnswerClick resolved'),
+
+    [quizAnswerClick.rejected]: (state, action) => {
+      // state.loading = false;
+      // state.error = action.payload;
+      console.log('quizAnswerClick rejected');
+    },
   },
 });
-
+//чаще всего в fulfilled делают action.payload типо загрузились данные => нужно занести их в стейт state.smth = action.payload
 export const {
-  fetchQuizesStart,
-  fetchQuizesSuccess,
-  fetchQuizesError,
+  // fetchQuizesStart,
+  // fetchQuizesSuccess,
+  // fetchQuizesError,
   fetchQuizSuccess,
   quizNextQuestion,
   quizSetState,
+  quizSetAnswerState,
+  quizSetResultsState,
   finishQuiz,
   retryQuiz,
 } = quizReducer.actions;

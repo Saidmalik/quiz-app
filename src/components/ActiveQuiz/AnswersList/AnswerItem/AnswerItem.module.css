@@ -6,7 +6,7 @@
   cursor: pointer;
 }
 .AnswerItem:hover {
-  background: rgb(214, 183, 8);
+  background: rgba(63, 25, 178, 0.5);
   transition: all 0.2s ease;
 }
 
