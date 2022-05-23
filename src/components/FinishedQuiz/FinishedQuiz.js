@@ -3,6 +3,7 @@ import classes from './FinishedQuiz.module.css';
 import { Link } from 'react-router-dom';
 
 export const FinishedQuiz = ({ results, quiz, onRetry }) => {
+  console.log(results, 'res');
   const successCount = Object.keys(results).reduce((total, key) => {
     if (results[key] === 'success') {
       total++;

@@ -1,15 +1,15 @@
-import classes from './Quiz.module.css';
-import { useEffect } from 'react';
-import { ActiveQuiz } from '../../components/ActiveQuiz/ActiveQuiz';
-import { FinishedQuiz } from '../../components/FinishedQuiz/FinishedQuiz';
-import { Loader } from '../../components/UI/Loader/Loader';
-import { useDispatch, useSelector } from 'react-redux';
+import classes from "./Quiz.module.css";
+import { useEffect } from "react";
+import { ActiveQuiz } from "../../components/ActiveQuiz/ActiveQuiz";
+import { FinishedQuiz } from "../../components/FinishedQuiz/FinishedQuiz";
+import { Loader } from "../../components/UI/Loader/Loader";
+import { useDispatch, useSelector } from "react-redux";
 import {
   fetchQuizById,
   quizAnswerClick,
   retryQuiz,
-} from '../../redux/reducers/quiz';
-import { useParams } from 'react-router-dom';
+} from "../../redux/reducers/quiz";
+import { useParams } from "react-router-dom";
 
 const Quiz = () => {
   const { id } = useParams();

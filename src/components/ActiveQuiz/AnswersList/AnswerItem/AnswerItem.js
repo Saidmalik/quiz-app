@@ -1,5 +1,5 @@
-import { useDispatch } from 'react-redux';
-import classes from './AnswerItem.module.css';
+import { useDispatch } from "react-redux";
+import classes from "./AnswerItem.module.css";
 
 export const AnswerItem = ({ answer, onAnswerClick, state }) => {
   const dispatch = useDispatch();

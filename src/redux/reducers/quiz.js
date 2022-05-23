@@ -1,25 +1,25 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axiosQuiz from '../../axios/axios-quiz';
+import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
+import axiosQuiz from "../../axios/axios-quiz";
 
 const initialState = {
   quizes: [],
   loading: false,
   error: null,
   activeQuestion: 0,
-  answerState: null,
+  answerState: {},
   isFinished: false,
   results: {},
   quiz: null,
 };
 
 export const fetchQuizes = createAsyncThunk(
-  'quiz/fetchQuizes',
+  "quiz/fetchQuizes",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosQuiz.get('/quizes.json');
+      const response = await axiosQuiz.get("/quizes.json");
 
       if (!response.status === 200) {
-        throw new Error('Data rendering error!');
+        throw new Error("Data rendering error!");
       }
       const quizes = [];
 
@@ -38,12 +38,12 @@ export const fetchQuizes = createAsyncThunk(
 );
 
 export const fetchQuizById = createAsyncThunk(
-  'quiz/fetchQuizById',
+  "quiz/fetchQuizById",
   async (quizId, { rejectWithValue }) => {
     try {
       const response = await axiosQuiz.get(`/quizes/${quizId}.json`);
       if (!response.status === 200) {
-        throw new Error('Erorr on rendering test id!');
+        throw new Error("Erorr on rendering test id!");
       }
       const quiz = response.data;
 
@@ -55,46 +55,40 @@ export const fetchQuizById = createAsyncThunk(
 );
 
 export const quizAnswerClick = createAsyncThunk(
-  'quiz/quizAnswerClick',
+  "quiz/quizAnswerClick",
   (answerId, { rejectWithValue, dispatch, getState }) => {
     const state = getState().quiz;
     try {
-      if (state.answerState) {
-        const key = Object.keys(state.answerState)[0];
-        if (state.answerState[key] === 'success') {
-          return;
-        }
-      }
       const question = state.quiz[state.activeQuestion];
       const results = state.results;
 
-      if (question.rightAnswerId === answerId) {
-        console.log('you are right');
+      const timeout = window.setTimeout(() => {
+        if (isQuizFinished(state)) {
+          dispatch(finishQuiz());
+        } else {
+          dispatch(quizNextQuestion(state.activeQuestion + 1));
+        }
+        window.clearTimeout(timeout);
+      }, 700);
 
-        // if (!results[question.id]) {
-        //   results[question.id] = 'success'; //add success on results
-        // }
+      if (question.rightAnswerId === answerId) {
+        console.log("you are right");
+
+        if (!results[question.id]) {
+          dispatch(resultOnClick("success"));
+        }
+
         dispatch(
-          quizSetState({
-            answerState: { [answerId]: 'success' },
-            results: results,
+          quizSetAnswerState({
+            answerState: { [answerId]: "success" },
           })
         );
-        const timeout = window.setTimeout(() => {
-          if (isQuizFinished(state)) {
-            dispatch(finishQuiz());
-          } else {
-            dispatch(quizNextQuestion(state.activeQuestion + 1));
-          }
-          window.clearTimeout(timeout);
-        }, 500);
       } else {
-        // results[question.id] = 'error'; //stay undefined
+        dispatch(resultOnClick("error"));
 
         dispatch(
-          quizSetState({
-            answerState: { [answerId]: 'error' },
-            results: results,
+          quizSetAnswerState({
+            answerState: { [answerId]: "error" },
           })
         );
       }
@@ -108,20 +102,27 @@ const isQuizFinished = (state) => {
 };
 
 export const quizReducer = createSlice({
-  name: 'quiz',
+  name: "quiz",
   initialState,
   reducers: {
-    quizSetState: (state, action) => {
-      state.answerState = action.payload.answerState;
-      state.results = action.payload.results;
-    },
+    quizSetAnswerState: (state, action) => {
+      const { answerState } = action.payload;
 
+      return {
+        ...state,
+        answerState,
+      };
+    },
+    resultOnClick: (state, action) => {
+      const question = state.quiz[state.activeQuestion];
+      state.results[question.id] = action.payload;
+    },
     finishQuiz: (state) => {
       state.isFinished = true;
     },
     quizNextQuestion: (state, action) => {
       state.activeQuestion = action.payload;
-      state.answerState = null;
+      state.answerState = {};
     },
     retryQuiz: (state) => {
       state.activeQuestion = 0;
@@ -156,24 +157,16 @@ export const quizReducer = createSlice({
       state.error = action.payload;
     },
 
-    [quizAnswerClick.pending]: () => console.log('quizAnswerClick pending'),
-    [quizAnswerClick.fulfilled]: () => console.log('quizAnswerClick resolved'),
-
-    [quizAnswerClick.rejected]: (state, action) => {
-      // state.loading = false;
-      // state.error = action.payload;
-      console.log('quizAnswerClick rejected');
+    [quizAnswerClick.rejected]: () => {
+      console.log("quizAnswerClick rejected");
     },
   },
 });
-//чаще всего в fulfilled делают action.payload типо загрузились данные => нужно занести их в стейт state.smth = action.payload
+
 export const {
-  // fetchQuizesStart,
-  // fetchQuizesSuccess,
-  // fetchQuizesError,
+  resultOnClick,
   fetchQuizSuccess,
   quizNextQuestion,
-  quizSetState,
   quizSetAnswerState,
   quizSetResultsState,
   finishQuiz,
